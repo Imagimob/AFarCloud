@@ -1,0 +1,110 @@
+version: '3'
+
+services:
+
+#   lorawan_server:
+#     build:
+#         context: ./lorawan_server/
+#         args:
+#            VERSION: v0.6.7    # The tag or branch to be  pulled from github and compiled
+#
+#     hostname: lorawan_server  # Lorawan server uses the hostname in the name of the folder hosting the DB. It can be set to anything, but needs to be defined to persist the DB over restarts
+#     ports:
+#         - 1680:1680/udp       # This is for the LoRa packer forwarder
+#     expose:
+#         - 8080                # Web interface --- we'll proxy that with NGinx & SSL
+#     environment:
+#         - LORAWAN_HOME=/storage            #Don't touch this one!
+#         - VIRTUAL_HOST=${LORASERVER_URL}
+#         - VIRTUAL_PORT=8080
+#         - LETSENCRYPT_HOST=${LORASERVER_URL}
+#         - LETSENCRYPT_EMAIL=${LE_EMAIL}
+#     volumes:
+#         - ./data/lorawan_server:/storage/
+#     restart: always
+
+   #VerneMQ server
+   mqtt:
+     volumes:
+       - ./data/nginx-proxy/certs:/certs:ro
+     environment:
+        - VIRTUAL_HOST=${MQTT_URL}
+        - VIRTUAL_PORT=8080
+        - LETSENCRYPT_HOST=${MQTT_URL}
+        - LETSENCRYPT_EMAIL=${LE_EMAIL}
+        - DOCKER_VERNEMQ_LISTENER__WSS__DEFAULT=0.0.0.0:8081
+        - DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT=0.0.0.0:1884
+        - DOCKER_VERNEMQ_LISTENER__WSS__CAFILE=/certs/${MQTT_URL}/chain.pem
+        - DOCKER_VERNEMQ_LISTENER__WSS__CERTFILE=/certs/${MQTT_URL}/cert.pem
+        - DOCKER_VERNEMQ_LISTENER__WSS__KEYFILE=/certs/${MQTT_URL}/key.pem
+        - DOCKER_VERNEMQ_LISTENER__SSL__CAFILE=/certs/${MQTT_URL}/chain.pem
+        - DOCKER_VERNEMQ_LISTENER__SSL__CERTFILE=/certs/${MQTT_URL}/cert.pem
+        - DOCKER_VERNEMQ_LISTENER__SSL__KEYFILE=/certs/${MQTT_URL}/key.pem
+
+   #Postgres DB with Postgis extension
+   postgis:
+     build:
+       context: ./postgis/
+       args:
+          POSTGRES_MAJOR: 11
+          POSTGIS_VERSION: 2.5.1
+          #Checksum of the file --- on a Mac, use "shasum -a 256 -b"
+          POSTGIS_SHA256: d380e9ec0aeee87c5d976b9111ea11199ba875f2cd496c49b4141db29cee9557
+     container_name: postgis
+     hostname: postgis
+     expose:
+          - 5432
+     environment:
+          - POSTGRES_PASSWORD
+          - POSTGRES_USER
+          - POSTGRES_DB
+     volumes:
+          - ./data/postgis:/var/lib/postgresql/data
+
+   #Runs Grafana
+   grafana:
+     environment:
+        - VIRTUAL_HOST=${GRAFANA_URL}
+        - LETSENCRYPT_HOST=${GRAFANA_URL}
+        - LETSENCRYPT_EMAIL=${LE_EMAIL}
+        - GF_SERVER_ROOT_URL=https://${GRAFANA_URL}
+
+   #The below two services will automatically create a reverse proxy with SSL through Let's Encrypt
+   nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+      - 443:443
+    #environment:
+    #  - ENABLE_IPV6=true
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./data/nginx-proxy/certs:/etc/nginx/certs:ro
+      - ./data/nginx-proxy/vhost.d:/etc/nginx/vhost.d
+      - ./data/nginx-proxy/www:/usr/share/nginx/html
+    restart: always
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: true
+
+   le_companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    volumes:
+      - ./data/lecompanion/acme:/etc/acme.sh
+      - ./data/nginx-proxy/certs:/etc/nginx/certs:rw
+      - ./data/nginx-proxy/vhost.d:/etc/nginx/vhost.d
+      - ./data/nginx-proxy/www:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: always
+
+    #Uncomment to send simulated data into the pipeline for testing
+    #connector_mock_input:
+    # build:
+    #   context: ./Backend
+    #:x
+    #command: Connector_MockDataInput.py
+    # environment:
+    #       - MQTT_USERNAME
+    #       - MQTT_PASSWORD
+    #       - MQTT_SERVER_URL
+    #       - MQTT_SERVER_PORT
+    # restart: always

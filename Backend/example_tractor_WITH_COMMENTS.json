@@ -1,0 +1,72 @@
+{
+    "resourceId": "urn:afc:AS09:cropsManagement:IMAG:tractor:tractor3_9",
+    "sequenceNumber": 21345,
+    "location": {
+      ### This is the real location of the sensor, updated frequently (~1 min or more)
+      "latitude": 45.45123,
+      "longitude": 25.25456,
+      "altitude": 2.10789
+    },
+    "observations": [
+      ### These observations will be updated frequently (~1 min or more)
+      {
+        "observedProperty": "battery",
+        "resultTime": 1595566126,
+        "result": {
+          "value": 0.253456,
+          "uom": "http://qudt.org/vocab/unit/VOLT"
+        }
+      },
+      {
+        "observedProperty": "signal_strength",
+        "resultTime": 1595566126,
+        "result": {
+            "value": -120,
+            "uom": "http://qudt.org/vocab/unit/DeciB"
+        }
+      },
+      {
+        "observedProperty": "vehicle_speed",
+        "resultTime": 1595566126,
+        "result": {
+          "value": 0.053456,
+          "uom": "http://www.qudt.org/vocab/unit/KiloM-PER-HR"
+        }
+      },
+      
+      ### Observations below ***will not necessarily appear in every message*** from the sensor
+      ### rather 1x every ~ few minutes 
+      {
+        "observedProperty": "tractor_state1", #= tractor OFF
+        "resultTime": 1595566126,
+        "result": {
+            "value": 0.003456,
+            "uom": "http://www.qudt.org/vocab/unit/UNITLESS"
+        }
+    },
+    {
+        "observedProperty": "tractor_state2", #= tractor idle
+        "resultTime": 1595566126,
+        "result": {
+            "value": 0.014,
+            "uom": "http://www.qudt.org/vocab/unit/UNITLESS"
+        }
+    },
+    {
+        "observedProperty": "tractor_state3", #= tractor driving on road
+        "resultTime": 1595566126,
+        "result": {
+            "value": 0.014,
+            "uom": "http://www.qudt.org/vocab/unit/UNITLESS"
+        }
+    },
+    {
+        "observedProperty": "tractor_state4", #= tractor working in field
+        "resultTime": 1595566126,
+        "result": {
+            "value": 0.014,
+            "uom": "http://www.qudt.org/vocab/unit/UNITLESS"
+        }
+    }
+    ]
+  }

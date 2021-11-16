@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+   #Allows access to the server from outside
+   #lorawan_server:
+   #  ports:
+   #     - 8080:8080
+
+   #Allows access to the server from outside
+   mqtt:
+     ports:
+        - 1883:1883
+
+   #Starts a jupyter server inside the containers private network for fiddling around
+   jupyter:
+     image: nicoinn/docker-data-science:latest
+     volumes:
+        - /Users/nicolas/github/afarcloud/:/data
+     ports:
+         - 8888:8888
+     environment:
+         - MQTT_USERNAME
+         - MQTT_PASSWORD
+         - MQTT_SERVER_URL
+         - MQTT_SERVER_PORT
+         - POSTGRES_PASSWORD
+         - POSTGRES_USER
+         - POSTGRES_URL
+         - POSTGRES_DB_NAME
+
+   #Sends a predefined message into the broker every second - for testing
+   connector_mock_input:
+     build:
+       context: ./Backend
+     command: Connector_MockDataInput.py
+     environment:
+          - MQTT_USERNAME
+          - MQTT_PASSWORD
+          - MQTT_SERVER_URL
+          - MQTT_SERVER_PORT
+     restart: always
+
+   #Reads everything that is happening in mqtt and prints it on the terminal
+   connector_check_stream:
+     build:
+       context: ./Backend
+     command: Connector_CheckDataStream.py
+     environment:
+          - MQTT_USERNAME
+          - MQTT_PASSWORD
+          - MQTT_SERVER_URL
+          - MQTT_SERVER_PORT
+     restart: always

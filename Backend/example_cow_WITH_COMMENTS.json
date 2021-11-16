@@ -1,0 +1,55 @@
+{
+	"resourceId": "urn:afc:AS03:livestockmanagement:IMAG:algorithm:cows1_3",
+	"location": {  
+        ### This location would not be the sensor/cow (no GPS on cows), 
+        ### but rather the (fixed) location of the receiver or the farm. 
+		"latitude": 45.45123,
+		"longitude": 25.25456,
+		"altitude": 2.10789
+	},
+	"observations": [{
+			### Format just right - exact property name still to be defined.
+			### Suggestion is also not to keep "state1"/"state2"/etc... for more flexibility 
+			"observedProperty": "cow_state1_fraction", #= cow ruminating
+			"resultTime": 1595566126,
+			"result": {
+				"value": 0.003456,
+				"uom": "http://www.qudt.org/vocab/unit/UNITLESS"
+			}
+		},
+		{
+			"observedProperty": "cow_state2_fraction", #= cow ruminating 
+			"resultTime": 1595566126,
+			"result": {
+				"value": 0.253456,
+				"uom": "http://www.qudt.org/vocab/unit/UNITLESS"
+			}
+		},
+		{
+			"observedProperty": "cow_state3_fraction", #= cow sleeping
+			"resultTime": 1595566126,
+			"result": {
+				"value": 0.053456,
+				"uom": "http://www.qudt.org/vocab/unit/UNITLESS"
+			}
+		},
+		{
+			"observedProperty": "battery_level",
+			"resultTime": 1595566126,
+			"result": {
+				"value": 3.65,
+				"uom": "http://qudt.org/vocab/unit/V"
+			}
+		},
+		{
+			"observedProperty": "signal_strength",
+			"resultTime": 1595566126,
+			"result": {
+				"value": -120,
+				"uom": "http://qudt.org/vocab/unit/DeciB"
+			}
+		}
+
+	],
+	"sequenceNumber": 327
+}

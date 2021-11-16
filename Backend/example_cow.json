@@ -1,0 +1,51 @@
+{
+	"resourceId": "urn:afc:AS03:livestockmanagement:IMAG:algorithm:cows1_3",
+	"location": {  
+		"latitude": 45.45123,
+		"longitude": 25.25456,
+		"altitude": 2.10789
+	},
+	"observations": [{
+			"observedProperty": "cow_state1_fraction",
+			"resultTime": 1595566126,
+			"result": {
+				"value": 0.003456,
+				"uom": "http://www.qudt.org/vocab/unit/UNITLESS"
+			}
+		},
+		{
+			"observedProperty": "cow_state2_fraction",
+			"resultTime": 1595566126,
+			"result": {
+				"value": 0.253456,
+				"uom": "http://www.qudt.org/vocab/unit/UNITLESS"
+			}
+		},
+		{
+			"observedProperty": "cow_state3_fraction", 
+			"resultTime": 1595566126,
+			"result": {
+				"value": 0.053456,
+				"uom": "http://www.qudt.org/vocab/unit/UNITLESS"
+			}
+		},
+		{
+			"observedProperty": "battery_level",
+			"resultTime": 1595566126,
+			"result": {
+				"value": 3.65,
+				"uom": "http://qudt.org/vocab/unit/V"
+			}
+		},
+		{
+			"observedProperty": "signal_strength",
+			"resultTime": 1595566126,
+			"result": {
+				"value": -120,
+				"uom": "http://qudt.org/vocab/unit/DeciB"
+			}
+		}
+
+	],
+	"sequenceNumber": 327
+}
