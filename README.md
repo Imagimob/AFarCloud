@@ -1,29 +1,41 @@
 # Imagimob - AFarcCloud project source code
-## Edge AI Tractor tracker and cow activity monitoring collar
+## Edge AI tractor tracker and cow activity monitoring collar
 
 [![AFarCloud](./media/logo-afarcloud.png)](http://www.afarcloud.eu/)[![Imagimob](./media/imagimob.png)](https://www.imagimob.com/)
 
 
-This repository contains the code for the sensors firmwares and backend developped during the AFarCloud project as presented at the final demonstrator in Pisa, November 2021.
+This repository contains the code for the sensors firmwares and backend services developped during the AFarCloud project as presented at the final demonstrator in Pisa, November 2021.
 
 ## Principle 
 
-The platform consists of sensor modules placed on animals or legacy equipement (for the demonstration, we used sensors in collars on cows and on legacy tractors) that collect - among others - accelerometric data, analyze it using a neural network on the sensor to detect high level behavioral patterns and send aggregated data about these over LoRa. The data is then processed and decoded by the backend before behind forwarded to the AFarCloud for further usage. 
+The platform consists of sensor modules placed on animals or legacy equipement (for the demonstration, we used sensors in collars on cows and on legacy tractors) that collect - among others - movement data, analyze it using a neural network on the sensor itself to detect high level behavioral patterns and send aggregated data about these over LoRa. The data is then processed and decoded by the backend before behind forwarded to the AFarCloud for further usage. 
 
-### Data captured and labelling
+![Tractor tracker](./media/IMG_0504.jpg)![Collar on cows](./media/IMG_0935_1.jpeg)![Collar Opened](./media/IMG_8686.jpg)
+
+
+### Data capture and labelling
 
 Data capture and labelling is done using small bluetooth enabled sensors from ... and the free [Imagimob Capture app](https://play.google.com/store/apps/details?id=com.imagimob.imagimob_capture&gl=IT). 
 
-The app simultaniously records video and accelerometer data and allows the user to label data as the video is being recorded. 
+![Sensor](./media/sensor.jpg)
+
+The app simultaniously records video and accelerometer data, and allows the user to label data as the video is being recorded. 
+
+![Data capture](./media/Skarmavbild_2021-11-17_kl._11.24.21.png)
 
 The labelling can be further improved after capture using [Imagimob Studio](https://developer.imagimob.com/install-imagimob-studio.html)
 
+
+
+![Data capture](./media/Skarmavbild_2021-11-17_kl._11.26.05.png)
 
 ### Training 
 
 Training of the neural network from labelled data is done using [Imagimob AI devlopment platform](https://www.imagimob.com/products). 
 
 After a satisfactory model has been trained, the platform exports it as pair of C files that contain all the routines and parameters for that particular model. (See the example models developped during AFarCloud in [Model_CowCollars](./Model_CowCollars) and [Model_Tractors](./Model_Tractors)). 
+
+![Labelled data](./media/242_o_cow2.png)
 
 These models require no external dependencies and being nothing more C99-complaint C code, will run on practically any microcontroller platform. 
 
@@ -44,15 +56,17 @@ The boards need at least an additional [Bosch BMI160 accelerometer/gyroscope](ht
 
 ### Network
 
-The final demonstrator was run using [The Things Network](https://www.thethingsnetwork.org/), but integrations with the Finnish country-wide LoRa network [Digita](https://www.digita.fi/) as well with self-hosted [lorawan-server](https://github.com/gotthardp/lorawan-server) we tested and available in the backend code. 
+The final demonstrator used [The Things Network](https://www.thethingsnetwork.org/), but integrations with the Finnish country-wide LoRa network [Digita](https://www.digita.fi/) as well with self-hosted [lorawan-server](https://github.com/gotthardp/lorawan-server) was tested and implementations are available in the backend. 
 
 ### Backend
 
-The backend code consists of a few microservices written in python that receive input from the LoRa network provider and communicate with each-other over MQTT. The services process raw input from the sensor into high level json structures and forward the data to the AFarCloud platform. 
+The backend code consists of a few microservices written in python that receive input from the LoRa network provider and communicate with each-other over MQTT. The services process raw input from the sensors into high level json structures and forward the data to the AFarCloud platform in a suitable format. 
 
-The data is also capture in a postgres database and can be visualized using Grafana allowing some basic usage of the solution independently of the AFarCloud infrastructure. 
+The data is also captured locally in a Postgres database (or optionally InfluxDB) and can be visualized using Grafana allowing some basic usage of the solution independently of the AFarCloud infrastructure. 
 
-The backend stack runs on docker and is currently configured to run entirely on one server. Running the stack in a fully distributed fashion has not been considered in this project. 
+![Visualization in Grafana](./media/grafana.png)
+
+The backend stack runs on Docker and is currently configured to run entirely on one server. Running the stack in a fully distributed fashion has not been considered in this project. 
 
 All the configurations, states and data generated by the services are stored in the folder ```./data```, i.e. this and only this part needs regular backups.
 
@@ -69,11 +83,11 @@ The following external libraries are required for compiling the firmware:
 - [BME280-I2C-ESP32](https://github.com/Imagimob/BME280-I2C-ESP32) : only required if using the BME280. The version hosted on Imagimob's github repository is customized for this project and backwards compatible with the original library --- but the original version won't work in this project. Note that you will also need to uninstall the official Adafruit BME280 if you have it as it will cause conflict with this one. 
 
 
-All these dependency should be cloned into your `~/Documents/Arduino/libraries/` folder. 
+All these dependencies should be cloned into your `~/Documents/Arduino/libraries/` folder. 
 
 ### Flashing:
 
-Have a look at the `config.h` file and create a `secrets.h` following the example providing with suitable LoRa app and dev UI keys. 
+Have a look at the `config.h` file and make changes according to your needs and/or region. You also need to create a `secrets.h` with suitable LoRa app and dev UI keys (see [sample file](./Firmware_Common/secrets.example.h) provided). 
 
 Then, compile and flash just like any other Arduino-compatible board. 
 
@@ -82,7 +96,7 @@ Then, compile and flash just like any other Arduino-compatible board.
 
 #### Requirements
 
-To run the stack, you will need [docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/install/). 
+To run the stack, you will need [Docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/install/). 
 
 #### Configure the stack to your needs
 
@@ -103,7 +117,7 @@ docker-compose build
  
 #### Run the application
 
-For devlopment, you probably want to launch the stack as
+For development, you probably want to launch the stack as
 
 ```docker-compose -f docker-compose.yml -f docker-compose.localdev.yaml up```
 
@@ -111,7 +125,7 @@ For devlopment, you probably want to launch the stack as
 On a production server, you should probably do 
 ```docker-compose -f docker-compose.yml -f docker-compose.prod.yaml up -d```
 
-The latter t will also call Let's encrypt to get the right certificates and configure an SSL proxy automagically. 
+The latter will also call Let's encrypt to get the right certificates and configure an SSL proxy automagically. 
 
 
 To shut down the entire application:
@@ -144,7 +158,7 @@ docker-compose up -d --force-recreate
 That's maximum possible clean up without touching the application data. If it doesn't work after that, your problem is in your `./data` folder and you shall be careful not to loose data...
 
 
-- *No way - I can't connect to Postgres...*: You might have attempted to change the user, password or database name in the .env file while your database already existed! You should not do this...
+- *No way - I can't connect to Postgres...*: You might have attempted to change the user, password or database name in the .env file for an existing database! You should not do this...
 
 Explanation: the info in .env file is used by Postgres only for initializing the database. Changing it in the .env will not "update" the information in the database automatically, but all clients will take the new user/password upon restart.
 
