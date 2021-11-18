@@ -1,7 +1,7 @@
-# Imagimob - AFarcCloud project source code
+# Imagimob - AFarCloud project source code
 ## Edge AI tractor tracker and cow activity monitoring collar
 
-[![AFarCloud](./media/logo-afarcloud.png)](http://www.afarcloud.eu/)[![Imagimob](./media/imagimob.png)](https://www.imagimob.com/)
+[![AFarCloud](./media/logo-afarcloud.png)](http://www.afarcloud.eu/) [![Imagimob](./media/imagimob.png)](https://www.imagimob.com/)
 
 
 This repository contains the code for the sensors firmwares and backend services developped during the AFarCloud project as presented at the final demonstrator in Pisa, November 2021.
@@ -15,7 +15,7 @@ The platform consists of sensor modules placed on animals or legacy equipement (
 
 ### Data capture and labelling
 
-Data capture and labelling is done using small bluetooth enabled sensors from ... and the free [Imagimob Capture app](https://play.google.com/store/apps/details?id=com.imagimob.imagimob_capture&gl=IT). 
+Data capture and labelling is done using small bluetooth enabled sensors, the [SmartBond SDK from dialog semiconductors](https://www.dialog-semiconductor.com/iotsensor) and the free [Imagimob Capture app](https://play.google.com/store/apps/details?id=com.imagimob.imagimob_capture&gl=IT). 
 
 ![Sensor](./media/sensor.jpg)
 
@@ -41,7 +41,7 @@ These models require no external dependencies and being nothing more C99-complai
 
 ### Sensors
 
-For the demonstrator, we used two variants of the TTGO familly of boards, centered around ESP32 CPU:
+For the demonstrator, we used two types of boards from the TTGO family build around the widespread Expressif ESP32 CPU:
 
 ![T-Beam](./media/tbeam.png)
 ![T-Display](./media/tdisplay.png)
@@ -49,7 +49,7 @@ For the demonstrator, we used two variants of the TTGO familly of boards, center
 - The T-Beam was used for the smart tractor trackers
 - The T-Display was used for the cow collars (due to smaller form factor)
 
-The main difference between the boards is the lack of GPS on the latter. The OLED display was not used in the project and was disabled on the cow collar. 
+The main difference between the boards is the lack of GPS and smaller form factor on the latter. The OLED display was not used in the project and was disabled on the cow collar. 
 
 The boards need at least an additional [Bosch BMI160 accelerometer/gyroscope](https://www.bosch-sensortec.com/products/motion-sensors/imus/bmi160/) and optionally a [Bosch BME280 environmental sensor](https://www.bosch-sensortec.com/products/environmental-sensors/humidity-sensors-bme280/) soldered to the I2C bus. 
 
@@ -62,7 +62,7 @@ The final demonstrator used [The Things Network](https://www.thethingsnetwork.or
 
 The backend code consists of a few microservices written in python that receive input from the LoRa network provider and communicate with each-other over MQTT. The services process raw input from the sensors into high level json structures and forward the data to the AFarCloud platform in a suitable format. 
 
-The data is also captured locally in a Postgres database (or optionally InfluxDB) and can be visualized using Grafana allowing some basic usage of the solution independently of the AFarCloud infrastructure. 
+The data is also captured locally in a Postgres database (or optionally InfluxDB) and can be visualized using Grafana, allowing some basic usage of the solution independently of the AFarCloud infrastructure if needed. 
 
 ![Visualization in Grafana](./media/grafana.png)
 
@@ -80,7 +80,7 @@ The firmware uses Arduino for ESP32. Please refer to [Expressif's official docum
 The following external libraries are required for compiling the firmware: 
 - [AXP202X](https://github.com/Imagimob/AXP202X_Library) : Library for controlling the programmable power supply on the V2 TTGO T-beam board. This is the standard library, forked for convenience.  
 - [BMI160](https://github.com/Imagimob/BMI160-Arduino) : Library for reading data from the BMI160 acceleremoter/Gyroscope. This is the standard library, forked for convenience.  
-- [BME280-I2C-ESP32](https://github.com/Imagimob/BME280-I2C-ESP32) : only required if using the BME280. The version hosted on Imagimob's github repository is customized for this project and backwards compatible with the original library --- but the original version won't work in this project. Note that you will also need to uninstall the official Adafruit BME280 if you have it as it will cause conflict with this one. 
+- [BME280-I2C-ESP32](https://github.com/Imagimob/BME280-I2C-ESP32) : only required if using the BME280. The version hosted on Imagimob's github repository is customized for this project and backwards compatible with the original library --- but the original version won't work in this project. Note that you will also need to uninstall the official Adafruit BME280 if you have it as it will cause conflicts with this one. 
 
 
 All these dependencies should be cloned into your `~/Documents/Arduino/libraries/` folder. 
@@ -89,21 +89,21 @@ All these dependencies should be cloned into your `~/Documents/Arduino/libraries
 
 Have a look at the `config.h` file and make changes according to your needs and/or region. You also need to create a `secrets.h` with suitable LoRa app and dev UI keys (see [sample file](./Firmware_Common/secrets.example.h) provided). 
 
-Then, compile and flash just like any other Arduino-compatible board. 
+Then, compile and flash just like for any other Arduino-compatible board. 
 
 
 ## Backend :
 
-#### Requirements
+### Requirements
 
 To run the stack, you will need [Docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/install/). 
 
-#### Configure the stack to your needs
+### Configure the stack to your needs
 
 You need to provide a suitable  ```.env``` file with parameters for your specific use case.  An example of .env file is provided in [env.example](./env.example).
 
 
-#### Prepare the environment:
+### Prepare the environment:
 
 - Download all necessary docker images:
 ```
@@ -115,7 +115,7 @@ docker-compose build
 ```
 
  
-#### Run the application
+### Run the application
 
 For development, you probably want to launch the stack as
 
